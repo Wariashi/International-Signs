@@ -1,0 +1,5 @@
+author: Wariashi
+api-version: '1.21'
+main: ch.wariashi.internationalsigns.InternationalSigns
+name: InternationalSigns
+version: '1.0-SNAPSHOT'
