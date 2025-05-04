@@ -41,6 +41,16 @@ class Config(plugin: JavaPlugin) {
     }
 
     /**
+     * Returns the password that is used to access the database.
+     * If no password has been defined in the config file, an empty String is returned.
+     *
+     * @return the password that is used to access the database
+     */
+    fun getDatabasePassword(): String {
+        return fileConfiguration.getString(databasePassword) ?: ""
+    }
+
+    /**
      * Returns the URL that is used to access the database.
      * If no URL has been defined in the config file, an empty String is returned.
      *
@@ -48,5 +58,15 @@ class Config(plugin: JavaPlugin) {
      */
     fun getDatabaseUrl(): String {
         return fileConfiguration.getString(databaseUrl) ?: ""
+    }
+
+    /**
+     * Returns the user that is used to access the database.
+     * If no user has been defined in the config file, an empty String is returned.
+     *
+     * @return the user that is used to access the database
+     */
+    fun getDatabaseUser(): String {
+        return fileConfiguration.getString(databaseUser) ?: ""
     }
 }
