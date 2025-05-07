@@ -19,9 +19,9 @@ class SignDao(plugin: InternationalSigns) : AbstractDao(plugin.configuration) {
             CREATE TABLE IF NOT EXISTS sign (
             id INT NOT NULL AUTO_INCREMENT,
             world VARCHAR(255) NOT NULL,
-            x DOUBLE NOT NULL,
-            y DOUBLE NOT NULL,
-            z DOUBLE NOT NULL,
+            x INT NOT NULL,
+            y INT NOT NULL,
+            z INT NOT NULL,
             PRIMARY KEY (id)
             )
         """.trimIndent()
