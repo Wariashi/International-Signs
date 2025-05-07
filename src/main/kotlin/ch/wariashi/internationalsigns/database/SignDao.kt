@@ -40,6 +40,35 @@ class SignDao(plugin: InternationalSigns) : AbstractDao(plugin.configuration) {
     }
 
     /**
+     * Deletes a sign entry from the database.
+     *
+     * @param location the location of the sign
+     */
+    fun delete(location: Location) {
+        val world = location.world?.name
+        val x = location.blockX
+        val y = location.blockY
+        val z = location.blockZ
+
+        try {
+            val connection = createConnection()
+            connection.use { connection ->
+                val deleteSql = "DELETE FROM sign WHERE world = ? AND x = ? AND y = ? AND z = ?"
+                val deleteStatement = connection.prepareStatement(deleteSql)
+                deleteStatement.use { deleteStatement ->
+                    deleteStatement.setString(1, world)
+                    deleteStatement.setInt(2, x)
+                    deleteStatement.setInt(3, y)
+                    deleteStatement.setInt(4, z)
+                    deleteStatement.execute()
+                }
+            }
+        } catch (exception: SQLException) {
+            logger.severe(exception.message)
+        }
+    }
+
+    /**
      * Inserts a new sign entry into the database if it does not exist yet.
      *
      * @param location the location of the sign

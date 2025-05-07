@@ -7,6 +7,7 @@ import org.bukkit.block.data.type.Sign
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -17,6 +18,21 @@ class InternationalSigns : JavaPlugin(), Listener {
     override fun onEnable() {
         val pluginManager = Bukkit.getPluginManager()
         pluginManager.registerEvents(this, this)
+    }
+
+    /**
+     * Deletes information of broken [signs][Sign] from the database.
+     *
+     * @param event the [Event] that is sent when a [Block] is broken.
+     */
+    @EventHandler
+    fun onBlockBreakEvent(event: BlockBreakEvent) {
+        val block = event.block
+        val blockData = block.blockData
+        if (blockData is Sign) {
+            val location = block.location
+            signDao.delete(location)
+        }
     }
 
     /**
