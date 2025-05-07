@@ -1,6 +1,7 @@
 package ch.wariashi.internationalsigns.database
 
 import ch.wariashi.internationalsigns.InternationalSigns
+import org.bukkit.Location
 import java.sql.SQLException
 
 /**
@@ -31,6 +32,50 @@ class SignDao(plugin: InternationalSigns) : AbstractDao(plugin.configuration) {
                 val statement = connection.prepareStatement(createSql)
                 statement.use { statement ->
                     statement.execute()
+                }
+            }
+        } catch (exception: SQLException) {
+            logger.severe(exception.message)
+        }
+    }
+
+    /**
+     * Inserts a new sign entry into the database if it does not exist yet.
+     *
+     * @param location the location of the sign
+     */
+    fun insert(location: Location) {
+        val world = location.world?.name
+        val x = location.blockX
+        val y = location.blockY
+        val z = location.blockZ
+
+        try {
+            val connection = createConnection()
+            connection.use { connection ->
+                // check if the sign already exists
+                val selectSql = "SELECT 1 FROM sign WHERE world = ? AND x = ? AND y = ? AND z = ?"
+                val selectStatement = connection.prepareStatement(selectSql)
+                selectStatement.use { selectStatement ->
+                    selectStatement.setString(1, world)
+                    selectStatement.setInt(2, x)
+                    selectStatement.setInt(3, y)
+                    selectStatement.setInt(4, z)
+                    val result = selectStatement.executeQuery()
+                    if (result.next()) {
+                        return
+                    }
+                }
+
+                // insert sign
+                val insertSql = "INSERT INTO sign (world, x, y, z) VALUES (?, ?, ?, ?)"
+                val insertStatement = connection.prepareStatement(insertSql)
+                insertStatement.use { insertStatement ->
+                    insertStatement.setString(1, world)
+                    insertStatement.setInt(2, x)
+                    insertStatement.setInt(3, y)
+                    insertStatement.setInt(4, z)
+                    insertStatement.execute()
                 }
             }
         } catch (exception: SQLException) {
