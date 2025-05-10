@@ -13,6 +13,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
+import org.bukkit.event.block.SignChangeEvent
 import org.bukkit.plugin.java.JavaPlugin
 
 class InternationalSigns : JavaPlugin(), Listener {
@@ -26,7 +27,7 @@ class InternationalSigns : JavaPlugin(), Listener {
     }
 
     /**
-     * Deletes information of broken [signs][Sign] from the database.
+     * Deletes information about broken [signs][Sign] from the database.
      *
      * @param event the [Event] that is sent when a [Block] is broken.
      */
@@ -40,7 +41,7 @@ class InternationalSigns : JavaPlugin(), Listener {
     }
 
     /**
-     * Saves information of placed [signs][Sign] to the database.
+     * Saves information about placed [signs][Sign] to the database.
      *
      * @param event the [Event] that is sent when a [Block] is placed.
      */
@@ -51,6 +52,31 @@ class InternationalSigns : JavaPlugin(), Listener {
             val location = block.location
             signDao.insert(location)
         }
+    }
+
+    /**
+     * Logs information about changed [signs][Sign].
+     *
+     * @param event the [Event] that is sent when a [Sign] is changed.
+     */
+    @EventHandler
+    fun onSignChangeEvent(event: SignChangeEvent) {
+        // find the sign ID
+        val block = event.block
+        val location = block.location
+        var signId = signDao.findIdByLocation(location)
+
+        // add the sign to the database if it does not exist yet
+        if (signId == null) {
+            signDao.insert(location)
+            signId = signDao.findIdByLocation(location)
+        }
+        if (signId == null) {
+            logger.warning("Sign at $location could not be added to the database.")
+            return
+        }
+
+        logger.info("Sign $signId has been changed.")
     }
 
     /**

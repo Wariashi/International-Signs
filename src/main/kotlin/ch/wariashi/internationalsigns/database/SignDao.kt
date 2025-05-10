@@ -42,7 +42,7 @@ class SignDao(plugin: InternationalSigns) : AbstractDao(plugin.configuration) {
     /**
      * Deletes a sign entry from the database.
      *
-     * @param location the location of the sign
+     * @param location the [Location] of the sign
      */
     fun delete(location: Location) {
         val world = location.world?.name
@@ -69,9 +69,44 @@ class SignDao(plugin: InternationalSigns) : AbstractDao(plugin.configuration) {
     }
 
     /**
+     * Finds the ID of the sign at the given [Location].
+     *
+     * @param location the [Location] of the sign
+     *
+     * @return the ID of the sign or `null` if it has not yet been written to the database
+     */
+    fun findIdByLocation(location: Location): Int? {
+        val world = location.world?.name
+        val x = location.blockX
+        val y = location.blockY
+        val z = location.blockZ
+
+        try {
+            val connection = createConnection()
+            connection.use { connection ->
+                val selectSql = "SELECT id FROM sign WHERE world = ? AND x = ? AND y = ? AND z = ?"
+                val selectStatement = connection.prepareStatement(selectSql)
+                selectStatement.use { selectStatement ->
+                    selectStatement.setString(1, world)
+                    selectStatement.setInt(2, x)
+                    selectStatement.setInt(3, y)
+                    selectStatement.setInt(4, z)
+                    val result = selectStatement.executeQuery()
+                    if (result.next()) {
+                        return result.getInt("id")
+                    }
+                }
+            }
+        } catch (exception: SQLException) {
+            logger.severe(exception.message)
+        }
+        return null
+    }
+
+    /**
      * Inserts a new sign entry into the database if it does not exist yet.
      *
-     * @param location the location of the sign
+     * @param location the [Location] of the sign
      */
     fun insert(location: Location) {
         val world = location.world?.name
