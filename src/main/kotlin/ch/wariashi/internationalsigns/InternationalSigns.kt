@@ -1,6 +1,7 @@
 package ch.wariashi.internationalsigns
 
 import ch.wariashi.internationalsigns.database.SignDao
+import ch.wariashi.internationalsigns.database.TranslationDao
 import org.bukkit.Bukkit
 import org.bukkit.block.Block
 import org.bukkit.block.data.type.HangingSign
@@ -17,6 +18,7 @@ import org.bukkit.plugin.java.JavaPlugin
 class InternationalSigns : JavaPlugin(), Listener {
     val configuration = Config(this)
     val signDao = SignDao(this)
+    val translationDao = TranslationDao(this)
 
     override fun onEnable() {
         val pluginManager = Bukkit.getPluginManager()
