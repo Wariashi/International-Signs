@@ -3,7 +3,10 @@ package ch.wariashi.internationalsigns
 import ch.wariashi.internationalsigns.database.SignDao
 import org.bukkit.Bukkit
 import org.bukkit.block.Block
+import org.bukkit.block.data.type.HangingSign
 import org.bukkit.block.data.type.Sign
+import org.bukkit.block.data.type.WallHangingSign
+import org.bukkit.block.data.type.WallSign
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -28,8 +31,7 @@ class InternationalSigns : JavaPlugin(), Listener {
     @EventHandler
     fun onBlockBreakEvent(event: BlockBreakEvent) {
         val block = event.block
-        val blockData = block.blockData
-        if (blockData is Sign) {
+        if (isSign(block)) {
             val location = block.location
             signDao.delete(location)
         }
@@ -42,11 +44,28 @@ class InternationalSigns : JavaPlugin(), Listener {
      */
     @EventHandler
     fun onBlockPlaceEvent(event: BlockPlaceEvent) {
-        val blockPlaced = event.blockPlaced
-        val blockData = blockPlaced.blockData
-        if (blockData is Sign) {
-            val location = blockPlaced.location
+        val block = event.blockPlaced
+        if (isSign(block)) {
+            val location = block.location
             signDao.insert(location)
+        }
+    }
+
+    /**
+     * Checks whether the [Block] is a sign.
+     *
+     * @param block the [Block] to check
+     *
+     * @return `true`, if the [Block] is a [HangingSign], [Sign], [WallHangingSign] or [WallSign], otherwise `false`
+     */
+    private fun isSign(block: Block): Boolean {
+        val blockData = block.blockData
+        return when (blockData) {
+            is HangingSign -> true
+            is Sign -> true
+            is WallHangingSign -> true
+            is WallSign -> true
+            else -> false
         }
     }
 }
