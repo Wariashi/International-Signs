@@ -8,6 +8,7 @@ import org.bukkit.block.data.type.HangingSign
 import org.bukkit.block.data.type.Sign
 import org.bukkit.block.data.type.WallHangingSign
 import org.bukkit.block.data.type.WallSign
+import org.bukkit.block.sign.Side
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -55,7 +56,7 @@ class InternationalSigns : JavaPlugin(), Listener {
     }
 
     /**
-     * Logs information about changed [signs][Sign].
+     * Updates a translation of a [Sign] when it has been changed.
      *
      * @param event the [Event] that is sent when a [Sign] is changed.
      */
@@ -76,7 +77,48 @@ class InternationalSigns : JavaPlugin(), Listener {
             return
         }
 
-        logger.info("Sign $signId has been changed.")
+        // get previous values
+        val sign = block.state as org.bukkit.block.Sign
+        val front = sign.getSide(Side.FRONT)
+        var front1 = front.getLine(0)
+        var front2 = front.getLine(1)
+        var front3 = front.getLine(2)
+        var front4 = front.getLine(3)
+        val back = sign.getSide(Side.BACK)
+        var back1 = back.getLine(0)
+        var back2 = back.getLine(1)
+        var back3 = back.getLine(2)
+        var back4 = back.getLine(3)
+
+        // update values
+        val side = event.side
+        if (side == Side.FRONT) {
+            front1 = event.getLine(0) ?: ""
+            front2 = event.getLine(1) ?: ""
+            front3 = event.getLine(2) ?: ""
+            front4 = event.getLine(3) ?: ""
+        } else {
+            back1 = event.getLine(0) ?: ""
+            back2 = event.getLine(1) ?: ""
+            back3 = event.getLine(2) ?: ""
+            back4 = event.getLine(3) ?: ""
+        }
+
+        // update the database
+        val player = event.player
+        val locale = player.locale
+        translationDao.insertOrUpdate(
+            signId = signId,
+            locale = locale,
+            front1 = front1,
+            front2 = front2,
+            front3 = front3,
+            front4 = front4,
+            back1 = back1,
+            back2 = back2,
+            back3 = back3,
+            back4 = back4
+        )
     }
 
     /**
